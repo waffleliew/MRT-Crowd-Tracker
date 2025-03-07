@@ -38,6 +38,7 @@ This command will:
 ### **3. Access the Application**
 Once the containers are running, access map via:
 - **Frontend**: [http://localhost:3000](http://localhost:3000)
+
 To check MongoDB use:
 - **MongoDB Admin Panel**: [http://localhost:8081](http://localhost:8081) (Login: `user1` / `Password123`) 
 
