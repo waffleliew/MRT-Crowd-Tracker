@@ -1,0 +1,80 @@
+version: "3.8"
+
+services:
+  # Zookeeper (Manages Kafka Brokers)
+  zookeeper:
+    image: wurstmeister/zookeeper
+    container_name: zookeeper
+    restart: always
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+
+  # Kafka Broker
+  kafka:
+    image: wurstmeister/kafka
+    container_name: kafka
+    restart: always
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+  # MongoDB (Database for storing MRT crowd density data)
+  mongo:
+    image: mongo:latest
+    container_name: mongodb
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: user1
+      MONGO_INITDB_ROOT_PASSWORD: Password123
+      MONGO_INITDB_DATABASE: mrt_db
+
+  # Mongo Express (MongoDB UI for Easy Management)
+  mongo-express:
+    image: mongo-express
+    container_name: mongo-express
+    restart: always
+    depends_on:
+      - mongo
+    ports:
+      - "8081:8081"
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: user1
+      ME_CONFIG_MONGODB_ADMINPASSWORD: Password123
+      ME_CONFIG_MONGODB_URL: mongodb://user1:Password123@mongo:27017/?authSource=admin
+
+  # Spring Boot Backend (Kafka Consumer, WebSocket, and API)
+  springboot:
+    build: ./SpringBoot
+    container_name: springboot-backend
+    restart: always
+    depends_on:
+      - kafka
+      # - mongo
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://user1:Password123@mongo:27017/mrt_db?authSource=admin  
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      SPRING_KAFKA_GROUP_ID: mrt_id
+
+  # Next.js Frontend (React App)
+  frontend:
+    build: ./Frontend
+    container_name: nextjs-frontend
+    restart: always
+    depends_on:
+      - springboot
+    ports:
+      - "3000:3000"
+    # environment:
+    #   NEXT_PUBLIC_BACKEND_URL: http://localhost:8080
