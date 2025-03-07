@@ -82,7 +82,7 @@ services:
       SPRING_DATA_MONGODB_URI: mongodb://user1:Password123@mongo:27017/mrt_db?authSource=admin  
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       SPRING_KAFKA_GROUP_ID: mrt_id
-      DATAMALL_APIKEY: 
+      DATAMALL_APIKEY: <Insert Your API>
 
   # Next.js Frontend (React App)
   frontend:
