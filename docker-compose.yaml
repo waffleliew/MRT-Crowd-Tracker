@@ -6,6 +6,7 @@ services:
     image: wurstmeister/zookeeper
     container_name: zookeeper
     restart: always
+    platform: linux/amd64
     ports:
       - "2181:2181"
     environment:
@@ -25,6 +26,12 @@ services:
       KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    healthcheck:
+      test: ["CMD", "bash", "-c", "echo > /dev/tcp/kafka/9092"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
   # MongoDB (Database for storing MRT crowd density data)
   mongo:
@@ -37,6 +44,13 @@ services:
       MONGO_INITDB_ROOT_USERNAME: user1
       MONGO_INITDB_ROOT_PASSWORD: Password123
       MONGO_INITDB_DATABASE: mrt_db
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh mongodb://user1:Password123@mongo:27017/admin --quiet
+      interval: 5s
+      timeout: 30s
+      retries: 5
+      start_period: 5s
+
 
   # Mongo Express (MongoDB UI for Easy Management)
   mongo-express:
@@ -58,14 +72,17 @@ services:
     container_name: springboot-backend
     restart: always
     depends_on:
-      - kafka
-      # - mongo
+      kafka:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
     ports:
       - "8080:8080"
     environment:
       SPRING_DATA_MONGODB_URI: mongodb://user1:Password123@mongo:27017/mrt_db?authSource=admin  
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       SPRING_KAFKA_GROUP_ID: mrt_id
+      DATAMALL_APIKEY: 
 
   # Next.js Frontend (React App)
   frontend:

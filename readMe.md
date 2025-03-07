@@ -17,7 +17,7 @@ The MRT Crowd Density Tracker is a real-time application designed to monitor and
 
 ### **Prerequisites**
 - Ensure you have **Docker** and **Docker Compose** installed on your system.
-- Fetch your LTA DataMall API [here](https://datamall.lta.gov.sg/content/datamall/en/request-for-api.html)
+- Fetch your LTA DataMall API [here](https://datamall.lta.gov.sg/content/datamall/en/request-for-api.html) and assign to `DATAMALL_APIKEY` env variable under [springboot service](docker-compose.yaml)
 
 ### **1. Clone the Repository**
 ```bash
@@ -40,7 +40,7 @@ Once the containers are running, access map via:
 - **Frontend**: [http://localhost:3000](http://localhost:3000)
 
 To check MongoDB use:
-- **MongoDB Admin Panel**: [http://localhost:8081](http://localhost:8081) (Login: `user1` / `Password123`) 
+- **MongoDB Admin Panel**: [http://localhost:8081](http://localhost:8081) //Username: `admin`, Password: `pass`. Feel free to change
 
 ### **4. Stopping the Application**
 To stop and remove the containers:

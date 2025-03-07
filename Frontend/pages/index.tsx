@@ -25,7 +25,7 @@ const IndexPage: NextPage = () => {
           });
   
           setStationCrowdLevels(initialCrowdLevels);
-          // console.log("Initial crowd data fetched:", initialCrowdLevels);
+          console.log("Initial crowd data fetched:", initialCrowdLevels);
         } catch (error) {
           console.error("Error fetching initial crowd data:", error);
         }
